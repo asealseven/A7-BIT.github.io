@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ image_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <div class="category dropdown">
+            <img src="{{ url_for('static', filename='category.png') }}" alt="Category">
+            <div class="dropdown-content">
+                <a href="{{ url_for('home') }}" onclick="filterCategory('fireplace', event)">Fireplace</a>
+                <a href="{{ url_for('home') }}" onclick="filterCategory('hot chocolate', event)">Hot Chocolate</a>
+                <a href="{{ url_for('home') }}" onclick="filterCategory('campfire', event)">Campfire</a>
+            </div>
+        </div>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" onclick="resetPage()">
+        </div>
+        <div class="menu">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search" onkeyup="handleSearch(event)">
+            </div>
+            <div class="account dropdown">
+                <img src="{{ url_for('static', filename='account.png') }}" alt="Account">
+                <div class="dropdown-content">
+                    {% if signed_in %}
+                    <a href="{{ url_for('signout') }}">Sign Out</a>
+                    <a href="#">Account</a>
+                    {% else %}
+                    <a href="#" onclick="openModal()">Sign Up</a>
+                    <a href="#" onclick="openModal()">Log In</a>
+                    {% endif %}
+                    <a href="#" onclick="openSupportModal()">Contact Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="image-section">
+            <div class="image-container">
+                <img src="{{ url_for('static', filename='images/' ~ filename) }}" alt="{{ image_title }}">
+            </div>
+            <div class="image-title">{{ image_title }}</div>
+        </div>
+
+        <div class="sidebar">
+            {% for recommended_image in recommended_images %}
+            <div class="recommended-image" onclick="window.location.href='{{ url_for('display_image', filename=recommended_image) }}'">
+                <img src="{{ url_for('static', filename='images/' ~ recommended_image) }}" alt="Recommended">
+                <div class="recommended-title">{{ recommended_image | replace(".jpg", "") }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="footer-bar">
+        This webpage is a joke!!! Do not take it seriously.
+    </div>
+
+    <script>
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                const searchQuery = document.getElementById('searchInput').value;
+                window.location.href = `/?search=${encodeURIComponent(searchQuery)}`;
+            }
+        }
+
+        function filterCategory(category, event) {
+            event.preventDefault();
+            window.location.href = `/?category=${encodeURIComponent(category)}`;
+        }
+
+        function resetPage() {
+            window.location.href = "/";
+        }
+
+        function adjustMarginBottom() {
+        const recommendedImages = document.querySelectorAll('.recommended-image');
+        recommendedImages.forEach(image => {
+            const title = image.querySelector('.recommended-title');
+            const titleHeight = title.offsetHeight;
+            const newMarginBottom = 80 - titleHeight;
+            image.style.marginBottom = `${newMarginBottom}px`;
+        });
+    }
+
+    window.onload = adjustMarginBottom;
+    window.onresize = adjustMarginBottom;
+    </script>
+</body>
+</html>
